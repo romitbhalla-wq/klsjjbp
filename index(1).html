@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jewelry Price Calculator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #d4af37;
+            --secondary-color: #2c3e50;
+            --accent-color: #c0392b;
+            --light-bg: #f8f9fa;
+            --dark-text: #2c3e50;
+            --success-color: #27ae60;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), #b8941f);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: white !important;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            color: white !important;
+        }
+
+        .nav-link.active {
+            color: white !important;
+            background-color: rgba(255,255,255,0.2) !important;
+            border-radius: 5px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--secondary-color), #34495e);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 1.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), #b8941f);
+            border: none;
+            border-radius: 25px;
+            padding: 0.7rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #219a52);
+            border: none;
+            border-radius: 25px;
+            padding: 0.7rem 2rem;
+            font-weight: 600;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(212, 175, 55, 0.25);
+        }
+
+        .rate-display {
+            background: linear-gradient(135deg, #fff, #f8f9fa);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .calculation-step {
+            background: white;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .price-highlight {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .total-price {
+            background: linear-gradient(135deg, var(--success-color), #219a52);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-top: 1rem;
+        }
+
+        .icon {
+            margin-right: 0.5rem;
+        }
+
+        .container-fluid {
+            max-width: 1400px;
+        }
+
+        @media (max-width: 768px) {
+            .card-body {
+                padding: 1rem;
+            }
+            
+            .rate-display {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-gem icon"></i>Jewelry Calculator
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" onclick="showPage('dashboard')">
+                            <i class="fas fa-tachometer-alt icon"></i>RATE Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showPage('silver')">
+                            <i class="fas fa-coins icon"></i>Silver Calculator
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showPage('gold')">
+                            <i class="fas fa-ring icon"></i>Gold Calculator
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Page -->
+    <div id="dashboard" class="page active">
+        <div class="container-fluid py-4">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="mb-0"><i class="fas fa-cog icon"></i>Rate Dashboard</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header">
+                                            <h5 class="mb-0">Price Settings</h5>
+                                            <button class="btn btn-primary btn-sm float-end" onclick="toggleEditMode()" id="editBtn">
+                                                <i class="fas fa-edit icon"></i>Edit Prices
+                                            </button>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <label class="form-label">Pure Gold Price per 10gm (₹)</label>
+                                                <input type="number" class="form-control" id="goldPrice" readonly>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Gold Making Charges (%)</label>
+                                                <input type="number" class="form-control" id="goldMakingPercent" readonly>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Pure Silver Price per kg (₹)</label>
+                                                <input type="number" class="form-control" id="silverPrice" readonly>
+                                            </div>
+                                            <div id="saveSection" style="display:none;">
+                                                <button class="btn btn-success me-2" onclick="saveSettings()">
+                                                    <i class="fas fa-save icon"></i>Save Changes
+                                                </button>
+                                                <button class="btn btn-secondary" onclick="cancelEdit()">
+                                                    <i class="fas fa-times icon"></i>Cancel
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header">
+                                            <h5 class="mb-0">Calculated Rates</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="rate-display">
+                                                <h6><i class="fas fa-star icon"></i>Gold Jewelry Rates (per 10gm)</h6>
+                                                <div class="row">
+                                                    <div class="col-4">
+                                                        <strong>18 Carat:</strong><br>
+                                                        <span class="price-highlight" id="gold18Rate">₹0</span>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <strong>20 Carat:</strong><br>
+                                                        <span class="price-highlight" id="gold20Rate">₹0</span>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <strong>22 Carat:</strong><br>
+                                                        <span class="price-highlight" id="gold22Rate">₹0</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="rate-display">
+                                                <h6><i class="fas fa-coins icon"></i>Silver Jewelry Rate</h6>
+                                                <strong>Per 10gm: </strong>
+                                                <span class="price-highlight" id="silverRate">₹0</span>
+                                            </div>
+                                            <div class="rate-display">
+                                                <h6><i class="fas fa-tools icon"></i>Making Charges</h6>
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <strong>Gold Making: </strong>
+                                                        <span id="goldMakingDisplay">0%</span> per gram
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Silver Calculator Page -->
+    <div id="silver" class="page">
+        <div class="container-fluid py-4">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="mb-0"><i class="fas fa-coins icon"></i>Silver Calculator</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 class="mb-0">Item Details</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <label class="form-label">Weight (grams)</label>
+                                                <input type="number" class="form-control" id="silverWeight" placeholder="Enter weight in grams" oninput="calculateSilverPrice()">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Making Charges</label>
+                                                <input type="text" class="form-control" id="silverMakingCharge" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 class="mb-0">Price Breakdown</h5>
+                                        </div>
+                                        <div class="card-body" id="silverCalculation">
+                                            <div class="text-center text-muted">
+                                                Enter weight to see calculation
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gold Calculator Page -->
+    <div id="gold" class="page">
+        <div class="container-fluid py-4">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="mb-0"><i class="fas fa-ring icon"></i>Gold Calculator</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 class="mb-0">Item Details</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <label class="form-label">Weight (grams)</label>
+                                                <input type="number" class="form-control" id="goldWeight" placeholder="Enter weight in grams" oninput="calculateGoldPrice()">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Gold Carat</label>
+                                                <select class="form-control" id="goldCarat" onchange="calculateGoldPrice()">
+                                                    <option value="">Select Carat</option>
+                                                    <option value="18">18 Carat</option>
+                                                    <option value="20">20 Carat</option>
+                                                    <option value="22">22 Carat</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Making Charges</label>
+                                                <input type="text" class="form-control" id="goldMakingCharge" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 class="mb-0">Price Breakdown</h5>
+                                        </div>
+                                        <div class="card-body" id="goldCalculation">
+                                            <div class="text-center text-muted">
+                                                Enter weight and select carat to see calculation
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Default values
+        const DEFAULT_VALUES = {
+            goldPrice: 65000,
+            goldMakingPercent: 10,
+            silverPrice: 75000
+        };
+
+        // Gold carat percentages
+        const GOLD_CARATS = {
+            18: 0.79,
+            20: 0.88,
+            22: 0.96
+        };
+
+        // Silver making charges by weight ranges
+        const SILVER_MAKING_CHARGES = [
+            { min: 0, max: 10, charge: 80 },
+            { min: 11, max: 20, charge: 100 },
+            { min: 21, max: 30, charge: 150 },
+            { min: 31, max: 60, charge: 200 },
+            { min: 61, max: 100, charge: 250 },
+            { min: 101, max: 200, charge: 300 },
+            { min: 201, max: 300, charge: 500 },
+            { min: 301, max: Infinity, charge: 700 }
+        ];
+
+        const GST_PERCENT = 3;
+        const SILVER_JEWELRY_PERCENT = 0.92;
+
+        // Initialize app
+        function initApp() {
+            loadSettings();
+            updateDashboard();
+        }
+
+        // Persistent storage for settings using global variables that survive navigation
+        // Check if settings already exist in window object (persist across page navigation)
+        if (!window.jewelryAppSettings) {
+            window.jewelryAppSettings = {
+                goldPrice: DEFAULT_VALUES.goldPrice,
+                goldMakingPercent: DEFAULT_VALUES.goldMakingPercent,
+                silverPrice: DEFAULT_VALUES.silverPrice,
+                isInitialized: false
+            };
+        }
+
+        // Reference to persistent settings
+        let appSettings = window.jewelryAppSettings;
+
+        // Load settings from persistent storage
+        function loadSettings() {
+            // Update form inputs with current values
+            document.getElementById('goldPrice').value = appSettings.goldPrice;
+            document.getElementById('goldMakingPercent').value = appSettings.goldMakingPercent;
+            document.getElementById('silverPrice').value = appSettings.silverPrice;
+        }
+
+        // Save settings to persistent memory
+        function saveSettings() {
+            const goldPrice = parseFloat(document.getElementById('goldPrice').value);
+            const goldMakingPercent = parseFloat(document.getElementById('goldMakingPercent').value);
+            const silverPrice = parseFloat(document.getElementById('silverPrice').value);
+            
+            // Validate inputs
+            if (isNaN(goldPrice) || goldPrice <= 0) {
+                alert('Please enter a valid gold price');
+                return;
+            }
+            if (isNaN(goldMakingPercent) || goldMakingPercent < 0) {
+                alert('Please enter a valid gold making charges percentage');
+                return;
+            }
+            if (isNaN(silverPrice) || silverPrice <= 0) {
+                alert('Please enter a valid silver price');
+                return;
+            }
+            
+            // Update persistent storage
+            appSettings.goldPrice = goldPrice;
+            appSettings.goldMakingPercent = goldMakingPercent;
+            appSettings.silverPrice = silverPrice;
+            appSettings.isInitialized = true;
+            
+            // Ensure the settings persist in window object
+            window.jewelryAppSettings = appSettings;
+            
+            toggleEditMode();
+            updateDashboard();
+            
+            // Show success message
+            alert('Settings saved successfully! Values will persist during this session.');
+        }
+
+        // Toggle edit mode
+        function toggleEditMode() {
+            const inputs = document.querySelectorAll('#goldPrice, #goldMakingPercent, #silverPrice');
+            const editBtn = document.getElementById('editBtn');
+            const saveSection = document.getElementById('saveSection');
+            
+            if (inputs[0].hasAttribute('readonly')) {
+                // Enable editing
+                inputs.forEach(input => input.removeAttribute('readonly'));
+                editBtn.innerHTML = '<i class="fas fa-times icon"></i>Cancel Edit';
+                saveSection.style.display = 'block';
+            } else {
+                // Disable editing
+                inputs.forEach(input => input.setAttribute('readonly', true));
+                editBtn.innerHTML = '<i class="fas fa-edit icon"></i>Edit Prices';
+                saveSection.style.display = 'none';
+                loadSettings(); // Reload original values from memory
+            }
+        }
+
+        // Cancel edit
+        function cancelEdit() {
+            toggleEditMode();
+        }
+
+        // Update dashboard calculations
+        function updateDashboard() {
+            const goldPrice = parseFloat(document.getElementById('goldPrice').value) || 0;
+            const goldMakingPercent = parseFloat(document.getElementById('goldMakingPercent').value) || 0;
+            const silverPrice = parseFloat(document.getElementById('silverPrice').value) || 0;
+            
+            // Calculate gold rates
+            document.getElementById('gold18Rate').textContent = `₹${Math.round(goldPrice * GOLD_CARATS[18])}`;
+            document.getElementById('gold20Rate').textContent = `₹${Math.round(goldPrice * GOLD_CARATS[20])}`;
+            document.getElementById('gold22Rate').textContent = `₹${Math.round(goldPrice * GOLD_CARATS[22])}`;
+            
+            // Calculate silver rate
+            const silverRatePer10gm = Math.round((silverPrice / 1000) * 10 * SILVER_JEWELRY_PERCENT);
+            document.getElementById('silverRate').textContent = `₹${silverRatePer10gm}`;
+            
+            // Display making charges
+            document.getElementById('goldMakingDisplay').textContent = `${goldMakingPercent}%`;
+        }
+
+        // Show page
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+            
+            // Update nav links
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        // Get silver making charge by weight
+        function getSilverMakingCharge(weight) {
+            for (const range of SILVER_MAKING_CHARGES) {
+                if (weight >= range.min && weight <= range.max) {
+                    return range.charge;
+                }
+            }
+            return 0;
+        }
+
+        // Calculate silver price
+        function calculateSilverPrice() {
+            const weight = parseFloat(document.getElementById('silverWeight').value);
+            const silverPrice = parseFloat(appSettings.silverPrice) || DEFAULT_VALUES.silverPrice;
+            
+            if (!weight || weight <= 0) {
+                document.getElementById('silverMakingCharge').value = '';
+                document.getElementById('silverCalculation').innerHTML = '<div class="text-center text-muted">Enter weight to see calculation</div>';
+                return;
+            }
+            
+            const makingCharge = getSilverMakingCharge(weight);
+            document.getElementById('silverMakingCharge').value = `₹${makingCharge}`;
+            
+            // Calculate prices
+            const silverPricePerGram = (silverPrice / 1000) * SILVER_JEWELRY_PERCENT;
+            const rawSilverValue = silverPricePerGram * weight;
+            const gstAmount = (rawSilverValue + makingCharge) * (GST_PERCENT / 100);
+            const totalPrice = rawSilverValue + makingCharge + gstAmount;
+            
+            // Display calculation
+            const calculationHtml = `
+                <div class="calculation-step">
+                    <strong>Silver Rate per gram:</strong> ₹${silverPricePerGram.toFixed(2)}
+                </div>
+                <div class="calculation-step">
+                    <strong>Raw Silver Value:</strong> ₹${rawSilverValue.toFixed(2)}<br>
+                    <small class="text-muted">${weight}g × ₹${silverPricePerGram.toFixed(2)}</small>
+                </div>
+                <div class="calculation-step">
+                    <strong>Making Charges:</strong> ₹${makingCharge}
+                </div>
+                <div class="calculation-step">
+                    <strong>GST (3%):</strong> ₹${gstAmount.toFixed(2)}<br>
+                    <small class="text-muted">3% of (Raw Value + Making Charges)</small>
+                </div>
+                <div class="total-price">
+                    <i class="fas fa-rupee-sign icon"></i>Total Price: ₹${totalPrice.toFixed(2)}
+                </div>
+            `;
+            
+            document.getElementById('silverCalculation').innerHTML = calculationHtml;
+        }
+
+        // Calculate gold price
+        function calculateGoldPrice() {
+            const weight = parseFloat(document.getElementById('goldWeight').value);
+            const carat = document.getElementById('goldCarat').value;
+            const goldPrice = parseFloat(appSettings.goldPrice) || DEFAULT_VALUES.goldPrice;
+            const goldMakingPercent = parseFloat(appSettings.goldMakingPercent) || DEFAULT_VALUES.goldMakingPercent;
+            
+            if (!weight || weight <= 0 || !carat) {
+                document.getElementById('goldMakingCharge').value = '';
+                document.getElementById('goldCalculation').innerHTML = '<div class="text-center text-muted">Enter weight and select carat to see calculation</div>';
+                return;
+            }
+            
+            // Calculate prices
+            const goldPricePerGram = (goldPrice / 10) * GOLD_CARATS[carat]; // Convert per 10gm to per gm
+            const rawGoldValue = goldPricePerGram * weight;
+            const makingCharge = rawGoldValue * (goldMakingPercent / 100);
+            const gstAmount = (rawGoldValue + makingCharge) * (GST_PERCENT / 100);
+            const totalPrice = rawGoldValue + makingCharge + gstAmount;
+            
+            document.getElementById('goldMakingCharge').value = `₹${makingCharge.toFixed(2)} (${goldMakingPercent}%)`;
+            
+            // Display calculation
+            const calculationHtml = `
+                <div class="calculation-step">
+                    <strong>${carat} Carat Gold Rate per gram:</strong> ₹${goldPricePerGram.toFixed(2)}
+                </div>
+                <div class="calculation-step">
+                    <strong>Raw Gold Value:</strong> ₹${rawGoldValue.toFixed(2)}<br>
+                    <small class="text-muted">${weight}g × ₹${goldPricePerGram.toFixed(2)}</small>
+                </div>
+                <div class="calculation-step">
+                    <strong>Making Charges (${goldMakingPercent}%):</strong> ₹${makingCharge.toFixed(2)}<br>
+                    <small class="text-muted">${goldMakingPercent}% of Raw Gold Value</small>
+                </div>
+                <div class="calculation-step">
+                    <strong>GST (3%):</strong> ₹${gstAmount.toFixed(2)}<br>
+                    <small class="text-muted">3% of (Raw Value + Making Charges)</small>
+                </div>
+                <div class="total-price">
+                    <i class="fas fa-rupee-sign icon"></i>Total Price: ₹${totalPrice.toFixed(2)}
+                </div>
+            `;
+            
+            document.getElementById('goldCalculation').innerHTML = calculationHtml;
+        }
+
+        // Initialize app on page load
+        document.addEventListener('DOMContentLoaded', initApp);
+
+        // Update dashboard when inputs change
+        document.getElementById('goldPrice').addEventListener('input', updateDashboard);
+        document.getElementById('goldMakingPercent').addEventListener('input', updateDashboard);
+        document.getElementById('silverPrice').addEventListener('input', updateDashboard);
+    </script>
+</body>
+</html>
