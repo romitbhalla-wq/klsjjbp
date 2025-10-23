@@ -427,60 +427,47 @@
 
         // Persistent storage for settings using global variables that survive navigation
         // Check if settings already exist in window object (persist across page navigation)
-        if (!window.jewelryAppSettings) {
-            window.jewelryAppSettings = {
-                goldPrice: DEFAULT_VALUES.goldPrice,
-                goldMakingPercent: DEFAULT_VALUES.goldMakingPercent,
-                silverPrice: DEFAULT_VALUES.silverPrice,
-                isInitialized: false
-            };
-        }
-
-        // Reference to persistent settings
-        let appSettings = window.jewelryAppSettings;
+        let appSettings = {
+    goldPrice: DEFAULT_VALUES.goldPrice,
+    goldMakingPercent: DEFAULT_VALUES.goldMakingPercent,
+    silverPrice: DEFAULT_VALUES.silverPrice
+};
 
         // Load settings from persistent storage
         function loadSettings() {
             // Update form inputs with current values
-            document.getElementById('goldPrice').value = appSettings.goldPrice;
-            document.getElementById('goldMakingPercent').value = appSettings.goldMakingPercent;
-            document.getElementById('silverPrice').value = appSettings.silverPrice;
+            appSettings.goldPrice = parseFloat(localStorage.getItem('goldPrice')) || DEFAULT_VALUES.goldPrice;
+    appSettings.goldMakingPercent = parseFloat(localStorage.getItem('goldMakingPercent')) || DEFAULT_VALUES.goldMakingPercent;
+    appSettings.silverPrice = parseFloat(localStorage.getItem('silverPrice')) || DEFAULT_VALUES.silverPrice;
+    
+    document.getElementById('goldPrice').value = appSettings.goldPrice;
+    document.getElementById('goldMakingPercent').value = appSettings.goldMakingPercent;
+    document.getElementById('silverPrice').value = appSettings.silverPrice;
         }
 
         // Save settings to persistent memory
         function saveSettings() {
             const goldPrice = parseFloat(document.getElementById('goldPrice').value);
-            const goldMakingPercent = parseFloat(document.getElementById('goldMakingPercent').value);
-            const silverPrice = parseFloat(document.getElementById('silverPrice').value);
-            
-            // Validate inputs
-            if (isNaN(goldPrice) || goldPrice <= 0) {
-                alert('Please enter a valid gold price');
-                return;
-            }
-            if (isNaN(goldMakingPercent) || goldMakingPercent < 0) {
-                alert('Please enter a valid gold making charges percentage');
-                return;
-            }
-            if (isNaN(silverPrice) || silverPrice <= 0) {
-                alert('Please enter a valid silver price');
-                return;
-            }
-            
-            // Update persistent storage
-            appSettings.goldPrice = goldPrice;
-            appSettings.goldMakingPercent = goldMakingPercent;
-            appSettings.silverPrice = silverPrice;
-            appSettings.isInitialized = true;
-            
-            // Ensure the settings persist in window object
-            window.jewelryAppSettings = appSettings;
-            
-            toggleEditMode();
-            updateDashboard();
-            
-            // Show success message
-            alert('Settings saved successfully! Values will persist during this session.');
+    const goldMakingPercent = parseFloat(document.getElementById('goldMakingPercent').value);
+    const silverPrice = parseFloat(document.getElementById('silverPrice').value);
+
+    if (isNaN(goldPrice) || goldPrice <= 0) return alert('Please enter a valid gold price');
+    if (isNaN(goldMakingPercent) || goldMakingPercent < 0) return alert('Please enter a valid gold making percentage');
+    if (isNaN(silverPrice) || silverPrice <= 0) return alert('Please enter a valid silver price');
+
+    // ✅ Save to localStorage
+    localStorage.setItem('goldPrice', goldPrice);
+    localStorage.setItem('goldMakingPercent', goldMakingPercent);
+    localStorage.setItem('silverPrice', silverPrice);
+
+    // Update appSettings
+    appSettings.goldPrice = goldPrice;
+    appSettings.goldMakingPercent = goldMakingPercent;
+    appSettings.silverPrice = silverPrice;
+
+    toggleEditMode();
+    updateDashboard();
+    alert('Settings saved! Values will now persist even after refresh.');
         }
 
         // Toggle edit mode
